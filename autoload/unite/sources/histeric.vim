@@ -13,8 +13,23 @@ let s:source = {
 function! s:source.gather_candidates(args, context)
   let list    = []
   let histmap = {}
-  if filereadable(fnamemodify('~/.vim_histeric', ':p'))
-    for cmd in reverse(readfile(fnamemodify('~/.vim_histeric', ':p')))
+
+  for v in range(0, histnr(":"))
+    let cmd = histget(':', v)
+    let cmd = substitute(cmd, '\s\+$', '', '')
+    if cmd != ''
+      if !has_key(histmap, ':' . cmd)
+        call add(list, { "word" : ':' . cmd  })
+        let histmap[':' . cmd] = 1
+      endif
+    endif
+  endfor
+
+  call reverse(list)
+
+  let file    = fnamemodify('~/.vim_histeric', ':p')
+  if filereadable(file)
+    for cmd in reverse(readfile(file))
       let cmd = substitute(cmd, '\s\+$', '', '')
       if has_key(histmap, cmd)
         continue
