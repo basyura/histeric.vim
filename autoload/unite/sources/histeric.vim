@@ -11,16 +11,18 @@ let s:source = {
       \ }
 
 function! s:source.gather_candidates(args, context)
-  let list = []
+  let list    = []
+  let histmap = {}
   if filereadable(fnamemodify('~/.vim_histeric', ':p'))
     for cmd in reverse(readfile(fnamemodify('~/.vim_histeric', ':p')))
       let cmd = substitute(cmd, '\s\+$', '', '')
-      call add(list, {
-            \ "word" : cmd ,
-            \ })
+      if has_key(histmap, cmd)
+        continue
+      endif
+      let histmap[cmd] = 1
+      call add(list, { "word" : cmd  })
     endfor
   endif
-
   return list
 endfunction
 
